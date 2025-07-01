@@ -1,0 +1,71 @@
+import streamlit as st
+import numpy as np
+import tensorflow as tf
+from PIL import Image
+from utils import (
+    preprocess_input_data,
+    generate_ecg_images,
+    create_patient_sequences,
+    load_model_and_scaler
+)
+
+st.set_page_config(page_title="🫀 Heart Disease Predictor", layout="wide")
+
+# --------- Custom CSS Styling ---------
+with open("styles.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# --------- Header ---------
+st.markdown("""
+<div class="header">
+    <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" class="icon"/>
+    <h1>Heart Disease Predictor</h1>
+    <p>AI-powered hybrid model using ECG + Medical Data</p>
+</div>
+""", unsafe_allow_html=True)
+
+# --------- Sidebar Inputs ---------
+with st.sidebar:
+    st.markdown("## 📝 Patient Data")
+    age = st.slider("Age", 29, 77, 54)
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    cp = st.selectbox("Chest Pain Type", [0, 1, 2, 3])
+    trestbps = st.slider("Resting BP", 90, 200, 130)
+    chol = st.slider("Cholesterol", 100, 600, 246)
+    fbs = st.selectbox("Fasting Blood Sugar > 120 mg/dl", [0, 1])
+    restecg = st.selectbox("Resting ECG", [0, 1, 2])
+    thalach = st.slider("Max Heart Rate", 70, 210, 150)
+    exang = st.selectbox("Exercise-induced Angina", [0, 1])
+    oldpeak = st.slider("ST Depression", 0.0, 6.2, 1.0)
+    slope = st.selectbox("ST Slope", [0, 1, 2])
+    ca = st.selectbox("Major Vessels", [0, 1, 2, 3])
+    thal = st.selectbox("Thalassemia", [0, 1, 2, 3])
+
+# --------- Prediction Section ---------
+if st.button("🩺 Predict"):
+    # Step 1: Preprocess input
+    input_data = np.array([[age, 1 if gender == "Male" else 0, cp, trestbps, chol, fbs,
+                            restecg, thalach, exang, oldpeak, slope, ca, thal]])
+
+    scaler, model = load_model_and_scaler()
+    tabular_data = preprocess_input_data(input_data, scaler)
+    ecg_image = generate_ecg_images(tabular_data)
+    sequence_data = create_patient_sequences(tabular_data)
+
+    # Step 2: Predict
+    prediction = model.predict([tabular_data, sequence_data, ecg_image])[0][0]
+    label = "Positive ❤️" if prediction > 0.5 else "Negative 💚"
+
+    # Step 3: Display Result
+    st.markdown(f"""
+    <div class="result-card">
+        <h2>Prediction Result:</h2>
+        <div class="confidence">{label}</div>
+        <p>Confidence: {prediction:.2%}</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Display the generated ECG image
+    st.subheader("🩺 Generated ECG Image (Synthetic)")
+    st.image(ecg_image[0], caption="Synthetic ECG Image (64x64 RGB)", use_column_width=True)
+

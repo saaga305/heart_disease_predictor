@@ -1,0 +1,47 @@
+/* Glassmorphism Container */
+.header {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    color: #ffffff;
+}
+
+.header .icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+}
+
+.result-card h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.result-card .confidence {
+    font-size: 36px;
+    font-weight: bold;
+    color: #f9c846;
+}
+
+/* Background & font */
+body {
+    background-color: #0f2027;
+    font-family: 'Poppins', sans-serif;
+}
